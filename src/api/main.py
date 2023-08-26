@@ -50,18 +50,54 @@ time_needed: It is the time needed to complete the task. Estimate given by user,
 Calculating priority is as follows & are done by priority_level_dict:
 (activity_type + deadline)/2 = priority_level
 
+deadline_calculation:
+It is a function that returns an urgency value for the task.
+
+current_datetime = datetime.now()
+    
+    # Calculate the time difference between current datetime and task deadline
+    time_difference = task_deadline - current_datetime
+    
+    # Check if the task is already overdue
+    if time_difference.total_seconds() < 0:
+        return "Overdue"
+    
+    # Calculate the remaining time in hours
+    remaining_hours = time_difference.total_seconds() / 3600
+    
+    # Calculate the remaining time in percentage of a week
+    remaining_percentage = (remaining_hours / (7 * 24)) * 100
+    
+    # Define urgency levels based on the remaining time percentage
+    if remaining_percentage >= 80:
+        return "Very Low"
+    elif remaining_percentage >= 60:
+        return "Low"
+    elif remaining_percentage >= 40:
+        return "Medium"
+    elif remaining_percentage >= 20:
+        return "High"
+    else:
+        return "Very High"
+
 """
 
+# Import Lists
+
+from datetime import datetime
+
+import time_framework as apiTime
 
 # Variables Are set
 
 task_list = []
 
+
 # Functions Are Defined
 
 
 def main():
-    pass
+    deadline_calculation(2023, 8, 28, 20, 50, 0)
 
 
 def priority(task_list, time_needed, priority_level, activity_type, time_created, deadline_date, deadline_time,
@@ -80,8 +116,7 @@ def priority(task_list, time_needed, priority_level, activity_type, time_created
 
 
 def priority_level_dict(activity_type, deadline):
-
-    match  activity_type:
+    match activity_type:
         case 'study':
             activityValue = 5
         case 'work':
@@ -93,11 +128,32 @@ def priority_level_dict(activity_type, deadline):
         case 'other':
             activityValue = 1
 
-    return (activityValue + deadline)/2
+    return (activityValue + deadline) / 2
 
 
-def deadline_calculation(deadline_date, deadline_time):
-    return 0
+def deadline_calculation(year, month, day, hour, minute, second):
+    current_datetime = datetime.now()
+
+    estimated_time = datetime(year, month, day, hour, minute, second)
+
+    time_difference = estimated_time - current_datetime
+
+    # Calculate how much the work is overdue.
+
+    # 0 = No Overdue.
+
+    if current_datetime < estimated_time:
+        time_unit = apiTime.convertToSTD(time_difference.seconds)
+        print("Task to be due in  " + str(time_unit))
+
+    if current_datetime > estimated_time:
+        correctTimeDifference = current_datetime - estimated_time
+
+        secondsPassed = correctTimeDifference.seconds
+
+        time_unit = apiTime.convertToSTD(secondsPassed)
+
+        print("Task is overdue by " + str(time_unit))
 
 
 def db_handler():
